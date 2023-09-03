@@ -5,7 +5,7 @@ Corn Leaf Disease Prediction System using Deep Learning, specifically leveraging
 Run the project:
 
 ```
-pip install requirements.txt
+pip install -r requirements.txt
 flask run
 ```
 
