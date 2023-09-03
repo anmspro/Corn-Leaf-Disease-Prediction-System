@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Corn Leaf Disease Prediction System</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/css/bootstrap.min.css"
+        crossorigin="anonymous">
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f4f4f4;
+            text-align: center;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        h1 {
+            color: #034e13;
+            /* Primary Color */
+            margin-bottom: 1rem;
+        }
+
+        form {
+            margin: 20px auto;
+            max-width: 400px;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        input[type="file"] {
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            width: 100%;
+            margin-bottom: 20px;
+            box-sizing: border-box;
+        }
+
+        input[type="submit"] {
+            background-color: #034e13;
+            /* Primary Color */
+            color: #fff;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            width: 100%;
+        }
+
+        img {
+            margin-top: 20px;
+            max-width: 80%;
+            border-radius: 10px;
+        }
+
+        h2 {
+            margin-top: 1rem;
+            color: #034e13;
+            /* Primary Color */
+        }
+
+        footer {
+            padding: 10px;
+            background-color: #034e13;
+            color: #fff;
+        }
+
+        .loading-container {
+            display: none;
+            justify-content: center;
+            align-items: center;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+        }
+
+        .loading-spinner {
+            border: 4px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top: 4px solid #0044cc;
+            /* Primary Color */
+            width: 50px;
+            height: 50px;
+            animation: spin 2s linear infinite;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <h1>Corn Leaf Disease Prediction System</h1>
+    </header>
+
+    <main>
+        <section>
+            <form method="POST" enctype="multipart/form-data">
+                <input type="file" name="file">
+                <input type="submit" value="Predict">
+            </form>
+        </section>
+
+        <section>
+            {% if image_path %}
+            <img src="{{ image_path }}" alt="Uploaded Image">
+            {% endif %}
+        </section>
+
+        <section>
+            {% if loading %}
+            <div class="loading-container">
+                <div class="loading-spinner"></div>
+            </div>
+            {% endif %}
+
+            {% if predictions %}
+            <h2>Predictions:</h2>
+            <div class="row px-8 pb-4">
+                {% for model_name, prediction in predictions.items() %}
+                <div class="col-4 pb-4">
+                    <h3>{{ model_name }}</h3>
+                    <p class="m-0"><strong>Prediction:</strong> {{ prediction.class }}</p>
+                    <p class="m-0"><strong>Confidence:</strong> {{ prediction.confidence }}</p>
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+
+        </section>
+    </main>
+
+    <footer>
+        &copy; 2023 Corn Leaf Disease Prediction System
+    </footer>
+
+    <script>
+        document.querySelector('form').addEventListener('submit', function () {
+            document.querySelector('.loading-container').style.display = 'flex';
+        });
+    </script>
+</body>
+
+</html>
