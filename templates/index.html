@@ -130,16 +130,13 @@
             </div>
             {% endif %}
 
-            {% if predictions %}
+            {% if predicted_class %}
             <h2>Predictions:</h2>
-            <div class="row px-8 pb-4">
-                {% for model_name, prediction in predictions.items() %}
-                <div class="col-4 pb-4">
+            <div class="row px-8 pb-4 text-center">
+                <div class="col-12 pb-4">
                     <h3>{{ model_name }}</h3>
-                    <p class="m-0"><strong>Prediction:</strong> {{ prediction.class }}</p>
-                    <p class="m-0"><strong>Confidence:</strong> {{ prediction.confidence }}</p>
+                    <p class="m-0 align-center"><strong>Prediction:</strong> {{ predicted_class }}</p>
                 </div>
-                {% endfor %}
             </div>
             {% endif %}
 
