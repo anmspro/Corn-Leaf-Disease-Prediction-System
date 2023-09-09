@@ -9,27 +9,13 @@ import os
 import torch.nn as nn
 
 app = Flask(__name__)
-# model_vgg16 = torch.load('Vgg16_corn_leaf.pth', map_location=torch.device('cpu'))
-# model_vgg19 = torch.load('Vgg19_corn_leaf.pth', map_location=torch.device('cpu'))
-# model_alexnet = torch.load('Alexnet_corn_leaf.pth', map_location=torch.device('cpu'))
-# model_mobilenet = torch.load('MobileNetv2_corn_leaf.pth', map_location=torch.device('cpu'))
-# model_resnet = torch.load('Resnet18_corn_leaf.pth', map_location=torch.device('cpu'))
-# model_SqueezeNet = torch.load('SqueezeNet_corn_leaf.pth', map_location=torch.device('cpu'))
 
-# model_vgg16.eval()
-# model_vgg19.eval()
-# model_alexnet.eval()
-# model_mobilenet.eval()
-# model_resnet.eval()
-# model_SqueezeNet.eval()
-
-
-model = models.vgg16(pretrained=True)
+model = models.resnet18(pretrained=True)
 model.fc = nn.Linear(in_features=512, out_features=4)
-model.load_state_dict(torch.load("Vgg16_corn_leaf.h5", map_location=torch.device('cpu')))
+model.load_state_dict(torch.load("Resnet18_corn_leaf.h5", map_location=torch.device('cpu')))
 model.eval()
 
-def predict_image(image_path, model):
+def predict_image(image_path, model, class_names):
     img = Image.open(image_path)
     transform = transforms.Compose([
         transforms.Resize((224, 224)),
@@ -39,22 +25,18 @@ def predict_image(image_path, model):
     img = transform(img).unsqueeze(0)
     with torch.no_grad():
         prediction = model(img)
-    predicted_class_index = torch.argmax(prediction).item()
-    return prediction, predicted_class_index
+    
+    probabilities = torch.softmax(prediction, dim=1)
+    predicted_class_index = torch.argmax(probabilities).item()
+    confidence_score = probabilities[0][predicted_class_index].item()
+    confidence_score = round(confidence_score, 4) * 100
+    
+    return class_names[predicted_class_index], confidence_score
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
-    models = {
-        # 'VGG16': model_vgg16,
-        # 'VGG19': model_vgg19,
-        # 'AlexNet': model_alexnet,
-        # 'MobileNetV2': model_mobilenet,
-        # 'ResNet18': model_resnet,
-        # 'SqueezeNet': model_SqueezeNet
-    }
     
     class_names = ['Blight', 'Common Rust', 'Gray Leaf Spot', 'Healthy']
-    predictions = {}
 
     if request.method == 'POST':
         if 'file' not in request.files:
@@ -66,14 +48,12 @@ def index():
             file_path = os.path.join('static', 'images', file.filename)
             file.save(file_path)
             
-            # for model_name, model in models.items():
-            prediction, predicted_class_index = predict_image(file_path, model)
-            predicted_class = class_names[predicted_class_index]
-            print(predicted_class)
-            # predictions[model_name] = {'class': predicted_class, 'confidence': prediction[0][predicted_class_index].item()}
+            predicted_class, confidence_score = predict_image(file_path, model, class_names)
+            print(predicted_class, confidence_score)
                 
-            return render_template('index.html', predicted_class=predicted_class, image_path=file_path)
+            return render_template('index.html', predicted_class=predicted_class, confidence_score=confidence_score, image_path=file_path)
     return render_template('index.html', predictions=None, image_path=None)
+
 
 if __name__ == '__main__':
     app.run()

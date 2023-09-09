@@ -135,7 +135,8 @@
             <div class="row px-8 pb-4 text-center">
                 <div class="col-12 pb-4">
                     <h3>{{ model_name }}</h3>
-                    <p class="m-0 align-center"><strong>Prediction:</strong> {{ predicted_class }}</p>
+                    <p class="m-0 align-center"><strong>Predicted Class:</strong> {{ predicted_class }}</p>
+                    <p class="m-0 align-center"><strong>Confidence Score:</strong> {{ confidence_score }}%</p>
                 </div>
             </div>
             {% endif %}
